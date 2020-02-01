@@ -86,7 +86,7 @@ public class RoboFRED_TeleOp extends OpMode
     //private static final double CLAW_SPD = 0.95;
     // min/max position
     private static final double CLAW_MIN = 0.53;
-    private static final double CLAW_GRAB = 0.56;
+    private static final double CLAW_GRAB = 0.55;
     private static final double CLAW_MAX = 0.95;
     // servo degrees to double
     //private static final double SERVO_DG_2_DBL = 0.00555555555555556;
@@ -95,7 +95,8 @@ public class RoboFRED_TeleOp extends OpMode
     // lift
     // lift variables
     /*
-        Gearbox Output Shaft: 753.2 PPR (188.3 rises of channel A)  (https://www.gobilda.com/content/spec_sheets/5202-0002-0027_spec_sheet.pdf)
+        Gearbox Output Shaft: 753.2 PPR (188.3 rises of channel A)
+        (https://www.gobilda.com/content/spec_sheets/5202-0002-0027_spec_sheet.pdf)
 
         PPR = Pulses Per Rotation
 
