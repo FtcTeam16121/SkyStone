@@ -143,16 +143,15 @@ public class RoboFRED_TeleOp extends OpMode
         liftMtr.setPower( LIFT_BREAK );
 
         // init the claw
-        servoClaw.setPosition( CLAW_MAX - 0.01 );
+        //servoClaw.setPosition( CLAW_MAX - 0.05 );
+        servoClaw.setPosition( CLAW_GRAB );
+        sleepyTime( 0.5 );
         servoClaw.setPosition( CLAW_MAX );
 
         // init reach
-        runtime.reset();
         servoReach.setDirection( DcMotorSimple.Direction.FORWARD );
-        do {
-            noop();
-            servoReach.setPower( 1 );
-        } while (!(runtime.milliseconds() > 500));
+        servoReach.setPower( 1 );
+        sleepyTime( 0.5 );
         servoReach.setPower( 0 );
 
 
@@ -692,5 +691,16 @@ public class RoboFRED_TeleOp extends OpMode
     private static void noop()
     {
 
+    }
+
+    private void sleepyTime (double seconds)
+    {
+        // pause for 1 sec
+        try {
+            // thread to sleep for 1000 milliseconds
+            Thread.sleep((long)(1000*seconds));
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 }

@@ -63,6 +63,13 @@ public class RoboFRED_Bob extends LinearOpMode {
     private DcMotor rgtDrvMtr;
     private CRServo servoReach;
     private Servo servoClaw;
+    private DcMotor liftMtr; // aka BOB
+
+
+    // the crane arm is too heavy for the motor break,
+    // so we apply a little power to keep the keep the crane from falling
+    private static final double LIFT_BREAK = 0.16;
+
 
     /*
         Gearbox Output Shaft: 753.2 PPR (188.3 rises of channel A)
@@ -88,11 +95,11 @@ public class RoboFRED_Bob extends LinearOpMode {
     static final double     DRIVE_SPEED             = 0.2;
     static final double     TURN_SPEED              = 0.15;
 
-    static final double     TURN_LEFT_LEFT = -11.9;
-    static final double     TURN_LEFT_RIGHT = 11.9;
+    static final double     TURN_LEFT_LEFT = -12;
+    static final double     TURN_LEFT_RIGHT = 12;
 
-    static final double     TURN_RIGHT_LEFT = 11.9;
-    static final double     TURN_RIGHT_RIGHT = -11.9;
+    static final double     TURN_RIGHT_LEFT = 12;
+    static final double     TURN_RIGHT_RIGHT = -12;
 
     static final double     TURN_PAUSE = 0.5;
 
@@ -116,6 +123,7 @@ public class RoboFRED_Bob extends LinearOpMode {
         rgtDrvMtr = hardwareMap.get(DcMotor.class, "right_drive");
         servoReach = hardwareMap.get( CRServo.class, "servoReach");
         servoClaw = hardwareMap.get( Servo.class, "servoClaw");
+        liftMtr = hardwareMap.get(DcMotor.class, "liftMtr");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor
@@ -140,16 +148,21 @@ public class RoboFRED_Bob extends LinearOpMode {
                 rgtDrvMtr.getCurrentPosition());
         telemetry.update();
 
+        // initialize the lift motor by turning on the break
+        liftMtr.setPower( LIFT_BREAK );
+
         // init the claw
-        servoClaw.setPosition( CLAW_MAX - 0.05 );
-        sleepyTime( 0.1 );
+        //servoClaw.setPosition( CLAW_MAX - 0.05 );
+        servoClaw.setPosition( CLAW_GRAB );
+        sleepyTime( 0.5 );
         servoClaw.setPosition( CLAW_MAX );
 
         // init reach
         servoReach.setDirection( DcMotorSimple.Direction.FORWARD );
         servoReach.setPower( 1 );
-        sleepyTime( 0.2 );
+        sleepyTime( 0.5 );
         servoReach.setPower( 0 );
+
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -170,6 +183,7 @@ public class RoboFRED_Bob extends LinearOpMode {
         } while (!(runtime.seconds() > CLAW_TIME));
 
         servoReach.setPower( 0 );
+        liftdrop();
 
         telemetry.addData("Claw", "Stopped");
         telemetry.addData("Status", "Run Time: " + runtime.toString());
@@ -183,6 +197,9 @@ public class RoboFRED_Bob extends LinearOpMode {
         clawGrab();                 // grab the first brick
         sleepyTime( CLAW_PAUSE );
 
+        lift();
+        sleepyTime( 0.1 );
+
         encoderDrive(DRIVE_SPEED, -6, -6, 4.0);  // backup
         resetDrvPos();
 
@@ -193,6 +210,9 @@ public class RoboFRED_Bob extends LinearOpMode {
 
         encoderDrive(DRIVE_SPEED, 40, 40, 4.0);  // drive under bridge
         resetDrvPos();
+
+        liftdrop();
+        sleepyTime( 0.1 );
 
         clawOpen();                     // release brick
         sleepyTime( CLAW_PAUSE );
@@ -211,6 +231,9 @@ public class RoboFRED_Bob extends LinearOpMode {
         clawGrab();                 // grab the second brick
         sleepyTime( CLAW_PAUSE );
 
+        lift();
+        sleepyTime( 0.1 );
+
         encoderDrive(DRIVE_SPEED, -6, -6, 4.0);  // backup
         resetDrvPos();
 
@@ -225,6 +248,9 @@ public class RoboFRED_Bob extends LinearOpMode {
         resetDrvPos();
 
         quitHittingYourself();
+
+        liftdrop();
+        sleepyTime( 0.1 );
 
         clawOpen();                     // release brick
         sleepyTime( CLAW_PAUSE );
@@ -329,6 +355,26 @@ public class RoboFRED_Bob extends LinearOpMode {
         servoClaw.setPosition( CLAW_MAX );
 
     }
+
+
+
+    private void lift  () {
+
+        // put motor into break speed when not in use
+        liftMtr.setMode( DcMotor.RunMode.RUN_WITHOUT_ENCODER );
+        liftMtr.setPower( LIFT_BREAK );
+    }
+
+
+
+    private void liftdrop  () {
+
+        // put motor into break speed when not in use
+        liftMtr.setMode( DcMotor.RunMode.RUN_WITHOUT_ENCODER );
+        liftMtr.setPower( 0 );
+    }
+
+
 
     // resets the drive motor encoders
     private void resetDrvPos()
